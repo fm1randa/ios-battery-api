@@ -1,4 +1,4 @@
 export interface IBatteryData {
-  currentPercentage: number;
+  percentage: number;
   date: string;
 }

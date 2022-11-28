@@ -15,7 +15,7 @@ describe("file", () => {
     it("should write the data from a received object to a specified JSON file", () => {
       // arrange
       const object: IBatteryData = {
-        currentPercentage: 50,
+        percentage: 50,
         date: new Date().toISOString(),
       };
 
@@ -31,7 +31,7 @@ describe("file", () => {
     it("should return true if the data was written successfully", () => {
       // arrange
       const object: IBatteryData = {
-        currentPercentage: 50,
+        percentage: 50,
         date: new Date().toISOString(),
       };
 
