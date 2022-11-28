@@ -2,7 +2,6 @@ import express from "express";
 import file from "./file";
 import { IBatteryData } from "../data";
 import path from "path";
-import previousData from "../data/data.json";
 
 const app = express();
 app.use(express.json());
@@ -24,12 +23,14 @@ app.post("/stop-charging", async (req, res) => {
     currentPercentage,
     date,
   };
+  const { save, read } = file("data.json");
+  const previousData = read();
   const percentageDiff =
     data.currentPercentage - previousData.currentPercentage;
   const currentDate = new Date(data.date);
   const previousDate = new Date(previousData.date);
   const timeDiff = currentDate.getTime() - previousDate.getTime();
-  file("data.json").save(data);
+  save(data);
   return res.status(200).json({
     percentageDiff,
     timeDiff,
