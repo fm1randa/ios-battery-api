@@ -8,19 +8,30 @@ app.use(express.json());
 
 app.post("/start-charging", async (req, res) => {
   const { percentage, date } = req.body;
-  console.log("start-charging", percentage, date);
+
   const data: IBatteryData = {
     percentage: percentage,
     date,
   };
-  const previousData = file("data.json").read();
+  const { read, save } = file("data.json");
+  const previousData = read();
+
+  if (!previousData) {
+    save(data);
+    return res.json({
+      message: `🔌 Started charging at ${percentage}% on ${format(date)}.`,
+    });
+  }
+
   const percentageDiff = previousData.percentage - percentage;
   const humanReadableTime = format(date, "en_US", {
     relativeDate: previousData.date,
   });
-  file("data.json").save(data);
-  return res.status(200).json({
-    message: `Started charging at ${percentage}% on ${date}.\nLast charge was ${humanReadableTime} ago.\n${percentageDiff}% of battery was used.`,
+  save(data);
+  return res.json({
+    message: `🔌 Started charging at ${percentage}% on ${format(
+      date
+    )}.\n🔋 Last charge was ${humanReadableTime} ago.\n${percentageDiff}% of battery was used.`,
   });
 });
 
@@ -32,13 +43,21 @@ app.post("/stop-charging", async (req, res) => {
   };
   const { save, read } = file("data.json");
   const previousData = read();
+  if (!previousData) {
+    save(data);
+    return res.json({
+      message: `Stopped charging at ${percentage}% on ${format(date)}.`,
+    });
+  }
   const percentageDiff = data.percentage - previousData.percentage;
   const currentDate = new Date(data.date);
   const previousDate = new Date(previousData.date);
   const timeDiff = currentDate.getTime() - previousDate.getTime();
   save(data);
   return res.status(200).json({
-    message: `${percentageDiff}% of battery was charged in ${
+    message: `📴 Disconnected from charger at ${percentage}% on ${format(
+      date
+    )}.\n🔋 ${percentageDiff}% of battery was charged in ${
       timeDiff / 1000 / 60
     } minutes.`,
   });
