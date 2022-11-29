@@ -50,12 +50,15 @@ app.post("/stop-charging", async (req, res) => {
   const percentageDiff = data.percentage - previousData.percentage;
   const currentDate = new Date(data.date);
   const previousDate = new Date(previousData.date);
-  const timeDiff = currentDate.getTime() - previousDate.getTime();
   save(data);
   return res.status(200).json({
-    message: `📴 Disconnected from charger at ${percentage}% on ${date}.\n🔋 ${percentageDiff}% of battery was charged in ${
-      timeDiff / 1000 / 60
-    } minutes.`,
+    message: `📴 Disconnected from charger at ${percentage}% on ${date}.\n🔋 ${percentageDiff}% of battery was charged ${format(
+      currentDate,
+      "en_US",
+      {
+        relativeDate: previousDate,
+      }
+    )}`,
   });
 });
 
